@@ -20,11 +20,10 @@ namespace Tipi.Tools.Services.Interfaces
         /// </remarks>
         /// <param name="file">Base64 file</param>
         /// <param name="folderName">Folder where to upload the image</param>
-        /// <param name="format">File extension</param>
         /// <returns>
         /// Returns an <c>UploadResult</c> containing the file url.
         /// </returns>
-        Task<UploadResult> UploadFileAsync(string file, string folderName, string format);
+        Task<UploadResult> UploadFileAsync(string file, string folderName);
 
         /// <summary>
         /// This method delete an existing file

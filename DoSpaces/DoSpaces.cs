@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Tipi.Tools.Services.Config;
+using Tipi.Tools.Services.Helpers;
 using Tipi.Tools.Services.Interfaces;
 using Tipi.Tools.Services.Models;
 
@@ -43,12 +44,14 @@ namespace Tipi.Tools.Services
         /// </remarks>
         /// <param name="file">Base64 file</param>
         /// <param name="folderName">Folder where to upload the image</param>
-        /// <param name="format">File extension</param>
         /// <returns>
         /// Returns an <c>UploadResult</c> containing the file url.
         /// </returns>
-        public async Task<UploadResult> UploadFileAsync(string file, string folderName, string format)
+        public async Task<UploadResult> UploadFileAsync(string file, string folderName)
         {
+            string format = ImageTools.GetFileExtention(file.Split("|")[0]);
+            file = ImageTools.CleanBase64Image(file.Split("|")[0]);
+
             var s3ClientConfig = new AmazonS3Config
             {
                 ServiceURL = Options.EndpointUrl,
@@ -107,6 +110,8 @@ namespace Tipi.Tools.Services
         /// </returns>
         public async Task<UploadResult> UpdateFileAsync(string fileToUpdate, string folderName, string fileUrl)
         {
+            fileToUpdate = ImageTools.CleanBase64Image(fileToUpdate.Split("|")[0]);
+
             var s3ClientConfig = new AmazonS3Config
             {
                 ServiceURL = Options.EndpointUrl,
