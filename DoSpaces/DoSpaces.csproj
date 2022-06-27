@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Tipi.Tools.Services</AssemblyName>
+    <RootNamespace>Tipi.Tools.Services</RootNamespace>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>Tipi.Tools.Services.DoSpaces</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>tipi(code)</Authors>
+    <Company>tipi(code)</Company>
+    <Product>DoSpaces</Product>
+    <Copyright>© tipicode | all rights reserved</Copyright>
+    <PackageProjectUrl>https://docs.codingtipi.com/docs/toolkit/dospaces</PackageProjectUrl>
+    <PackageIcon>Assets/tipi.png</PackageIcon>
+    <RepositoryUrl>https://github.com/TipiCode/dospaces</RepositoryUrl>
+    <PackageTags>c#;</PackageTags>
+    <PackageReleaseNotes>Minor fixes</PackageReleaseNotes>
+    <NeutralLanguage>en</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.9.19" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\tipi.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
