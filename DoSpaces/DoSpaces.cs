@@ -65,11 +65,18 @@ namespace Tipi.Tools.Services
                 var name = Guid.NewGuid().ToString();
                 // Converting the file to a byte array to save it with the memory stream
                 byte[] bytes = Convert.FromBase64String(file);
+
+                var rootPath = "";
+                if (!String.IsNullOrEmpty(Options.Root))
+                    rootPath = $"/{Options.Root}";
+
                 using (s3Client)
                 {
+                    
+
                     var request = new PutObjectRequest
                     {
-                        BucketName = Options.BucketName + @"/" + Options.Root + @"/" + folderName,
+                        BucketName = Options.BucketName + rootPath + @"/" + folderName,
                         CannedACL = S3CannedACL.PublicRead,
                         Key = name + format
                     };
@@ -81,7 +88,7 @@ namespace Tipi.Tools.Services
                     }
                     //request.StreamTransferProgress -= RequestProgress;
                 }
-                return new UploadResult(true, Path: $"https://{Options.BucketName}.{Options.Endpoint}/{Options.Root}/{folderName}/{name + format}");
+                return new UploadResult(true, Path: $"https://{Options.BucketName}.{Options.Endpoint}{rootPath}/{folderName}/{name + format}");
             }
             catch (AmazonS3Exception e)
             {
@@ -128,11 +135,15 @@ namespace Tipi.Tools.Services
                 // Converting the file to a byte array to save it with the memory stream
                 byte[] bytes = Convert.FromBase64String(fileToUpdate);
 
+                var rootPath = "";
+                if (!String.IsNullOrEmpty(Options.Root))
+                    rootPath = $"/{Options.Root}";
+
                 using (s3Client)
                 {
                     var request = new PutObjectRequest
                     {
-                        BucketName = Options.BucketName + @"/" + Options.Root + @"/" + folderName,
+                        BucketName = Options.BucketName + rootPath + @"/" + folderName,
                         CannedACL = S3CannedACL.PublicRead,
                         Key = fileName[fileName.Length - 1]
                     };
@@ -182,13 +193,17 @@ namespace Tipi.Tools.Services
             };
             s3Client = new AmazonS3Client(Options.AccessKey, Options.SecretKey, s3ClientConfig);
 
+            var rootPath = "";
+            if (!String.IsNullOrEmpty(Options.Root))
+                rootPath = $"/{Options.Root}";
+
             try
             {
                 using (s3Client)
                 {
                     var request = new DeleteObjectRequest
                     {
-                        BucketName = Options.BucketName + @"/" + Options.Root + @"/" + folder,
+                        BucketName = Options.BucketName + rootPath + @"/" + folder,
                         Key = fileName[fileName.Length - 1]
                     };
                     await s3Client.DeleteObjectAsync(request);
