@@ -9,7 +9,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>Tipi.Tools.Services.DoSpaces</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>tipi(code)</Authors>
     <Company>tipi(code)</Company>
     <Product>DoSpaces</Product>
@@ -24,6 +24,7 @@
     <FileVersion>1.0.2</FileVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Title>Digital Ocean Spaces</Title>
   </PropertyGroup>
 
   <ItemGroup>
