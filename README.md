@@ -19,12 +19,12 @@ Todas nuestras librerías se encuentran publicadas en Nuget para su fácil acces
 <table>
 <tr>
 <th align="center">
-<a href="https://github.com/TipiCode/UI-Extensions-MVC/issues">
+<a href="https://github.com/TipiCode/Digital-Ocean-Spaces/issues">
 <img src="https://tipi-pod.sfo3.cdn.digitaloceanspaces.com/github%2Fissue-report.jpg">
 </a>
 </th>
 <th align="center">
-<a href="https://github.com/TipiCode/UI-Extensions-MVC/pulls">
+<a href="https://github.com/TipiCode/Digital-Ocean-Spaces/pulls">
 <img src="https://tipi-pod.sfo3.cdn.digitaloceanspaces.com/github%2Ffeature-request.jpg">
 </a>
 </th>
@@ -32,10 +32,10 @@ Todas nuestras librerías se encuentran publicadas en Nuget para su fácil acces
 </table>
 
 # Hecho con .NET
-El proyecto es orgullosamente hecho con .NET y C#, por el momento únicamente hay planes de soportar versiones de .NET (LTS) es decir las versiones que tienen un ciclo de soporte de 3 años. Actualmente está librería se encuentra desarrollada para .NET 6, si deseas agregar la compatibilidad para .NET 7 ¡Enhorabuena! Estamos aquí para apoya cualquier actualización que desees realizar. 
+El proyecto es orgullosamente hecho con .NET y C#, por el momento únicamente hay planes de soportar versiones de .NET (LTS) es decir las versiones que tienen un ciclo de soporte de 3 años. Actualmente está librería se encuentra desarrollada para .NET 8, si deseas agregar la compatibilidad para .NET 7 ¡Enhorabuena! Estamos aquí para apoya cualquier actualización que desees realizar. 
 
 Soporte para Versiones de .NET:
-- .NET 6
+- .NET 8
 
 # ¡Comencemos! 
 Para iniciar a utilizar esta librería en tus proyectos puedes descargarla directamente de Nuget o bien puedes clonar este repositorio para poder utilizarla y probarla en tus desarrollos locales.
@@ -43,7 +43,7 @@ Para iniciar a utilizar esta librería en tus proyectos puedes descargarla direc
 ### Requisitos: 
 Para poder utilizar la librería necesitas contar con un ambiente de desarrollo para .NET y tener instalado el SDK o Runtime de .NET según la versión que vayas a utilizar. Acá te dejamos más información de como configurar tu ambiente y algunas de las herramientas que recomendamos.
 
-- [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 - [Visual Studio Code](https://code.visualstudio.com/)
 
@@ -63,12 +63,12 @@ Para instalar el proyecto por medio de Nuget puedes hacerlo buscando dentro de l
 
 Utilizando .NET CLI
 ```sh
-   dotnet add package Tipi.Tools.Services.DoSpaces --version 1.0.2
+   dotnet add package Tipi.Tools.Services.DoSpaces --version 8.0.1
 ```
 
 Utilizando Package Manager 
 ```sh
-   NuGet\Install-Package Tipi.Tools.Services.DoSpaces -Version 1.0.2
+   NuGet\Install-Package Tipi.Tools.Services.DoSpaces -Version 8.0.1
 ```
 # ¿Tienes alguna duda? 
 Si tienes alguna duda puedes comunicarte con nosotros, trataremos de solucionar tus preguntas lo más pronto posible, puedes escribirnos al siguiente correo electrónico con el tema Tipi Tool - Digital Ocean Spaces. O bien nos puedes contactar por cualquiera de nuestras redes sociales.
