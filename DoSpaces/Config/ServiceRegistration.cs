@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Amazon;
+using Amazon.S3;
+using Microsoft.Extensions.DependencyInjection;
 using Tipi.Tools.Services.Interfaces;
 
 namespace Tipi.Tools.Services.Config
@@ -22,8 +24,9 @@ namespace Tipi.Tools.Services.Config
         /// <param name="bucketName">Spaces Bucket name .</param>
         /// <param name="root">Folders path.</param>
         /// <param name="endpointUrl">Spaces url path.</param>
-        /// <param name="endpoint">Spaces url.</param>
-        public static void ConfigureDoSpaces(this IServiceCollection services, string accessKey, string secretKey, string bucketName, string root, string endpointUrl, string endpoint)
+        /// <param name="region">Region.</param>
+        /// <param name="useCdn">If you want your url to use the default CDN or not.</param>
+        public static void ConfigureDoSpaces(this IServiceCollection services, string accessKey, string secretKey, string bucketName, string root, string endpointUrl, string region, string useCdn)
         {
             //S3 Storage Config
             services.AddTransient<IDoSpaces, DoSpaces>();
@@ -34,10 +37,21 @@ namespace Tipi.Tools.Services.Config
                 { "BucketName", bucketName },
                 { "Root", root },
                 { "EndpointUrl", endpointUrl },
-                { "Endpoint", endpoint }
+                { "Region", region },
+                { "UseCdn", useCdn }
             };
 
-            services.AddSingleton(new S3BucketOptions(optionDictionary));
+            var options = new S3BucketOptions(optionDictionary);
+            services.AddSingleton(options);
+
+            var s3ClientConfig = new AmazonS3Config
+            {
+                RegionEndpoint = RegionEndpoint.GetBySystemName(options.Region),
+                ServiceURL = options.EndpointUrl,
+            };
+
+            var s3Client = new AmazonS3Client(options.AccessKey, options.SecretKey, s3ClientConfig);
+            services.AddSingleton(s3Client);
         }
 
     }

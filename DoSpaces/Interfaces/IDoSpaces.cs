@@ -32,12 +32,11 @@ namespace Tipi.Tools.Services.Interfaces
         /// <remarks>
         /// Delete an existing file
         /// </remarks>
-        /// <param name="url">Url of the file or file name</param>
-        /// <param name="folder">Folder where the uploaded image is saved</param>
+        /// <param name="fileUrl">Url of the file or file name</param>
         /// <returns>
         /// Returns an <c>UploadResult</c> containing the operation result.
         /// </returns>
-        Task<UploadResult> DeleteFileAsync(string url, string folder);
+        Task DeleteFileAsync(string fileUrl);
 
         /// <summary>
         /// This method Updates an existing file
@@ -47,11 +46,10 @@ namespace Tipi.Tools.Services.Interfaces
         /// Update an existing file
         /// </remarks>
         /// <param name="file">Base64 file</param>
-        /// <param name="folderName">Folder where the uploaded image is saved</param>
         /// <param name="fileUrl">Url of the image to update</param>
         /// <returns>
         /// Returns an <c>UploadResult</c> containing the operation result.
         /// </returns>
-        Task<UploadResult> UpdateFileAsync(string file, string folderName, string fileUrl);
+        Task UpdateFileAsync(string file, string fileUrl);
     }
 }

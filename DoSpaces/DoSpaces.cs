@@ -16,22 +16,20 @@ namespace Tipi.Tools.Services
     /// </remarks>
     public class DoSpaces : IDoSpaces
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public S3BucketOptions Options { get; }
-        /// <summary>
-        /// 
-        /// </summary>
-        private static IAmazonS3 s3Client;
+
+        private readonly S3BucketOptions _options;
+        private readonly AmazonS3Client _client;
 
         /// <summary>
-        /// 
+        /// Contructor with supported dependency injection
         /// </summary>
-        /// <param name="optionsAccessor"></param>
-        public DoSpaces(S3BucketOptions optionsAccessor)
+        /// <param name="options">Options to support the Aws S3 client.</param>
+        /// <param name="client">Amazon S3 client</param>
+        public DoSpaces(S3BucketOptions options, 
+            AmazonS3Client client)
         {
-            Options = optionsAccessor;
+            _options = options;
+            _client = client;
         }
 
         #region Public Methods
@@ -52,43 +50,41 @@ namespace Tipi.Tools.Services
             string format = ImageTools.GetFileExtention(file.Split("|")[0]);
             file = ImageTools.CleanBase64Image(file.Split("|")[0]);
 
-            var s3ClientConfig = new AmazonS3Config
-            {
-                ServiceURL = Options.EndpointUrl,
-            };
-
-            s3Client = new AmazonS3Client(Options.AccessKey, Options.SecretKey, s3ClientConfig);
-
             try
             {
                 // Name for the file will be a random Guid
-                var name = Guid.NewGuid().ToString();
+                var name = Guid.NewGuid().ToString().Split('-')[0];
                 // Converting the file to a byte array to save it with the memory stream
                 byte[] bytes = Convert.FromBase64String(file);
 
                 var rootPath = "";
-                if (!String.IsNullOrEmpty(Options.Root))
-                    rootPath = $"/{Options.Root}";
+                if (!String.IsNullOrEmpty(_options.Root))
+                    rootPath = $"{_options.Root}";
 
-                using (s3Client)
+                
+                var filePath = rootPath + @"/" + folderName;
+                var key = name + format;
+                var cleanedBody = _options.EndpointUrl.Replace("https://", "")
+                    .Replace(_options.Region, "")
+                    .Replace("/", "")
+                    .Substring(1);
+
+                using var stream = new MemoryStream(bytes);
+
+                // Upload the stream
+                var uploadRequest = new PutObjectRequest
                 {
-                    
+                    BucketName = _options.BucketName,
+                    Key = $"{filePath}/{key}",
+                    InputStream = stream,
+                    CannedACL = S3CannedACL.PublicRead
+                };
 
-                    var request = new PutObjectRequest
-                    {
-                        BucketName = Options.BucketName + rootPath + @"/" + folderName,
-                        CannedACL = S3CannedACL.PublicRead,
-                        Key = name + format
-                    };
-                    //request.StreamTransferProgress += RequestProgress;
-                    using (var ms = new MemoryStream(bytes))
-                    {
-                        request.InputStream = ms;
-                        await s3Client.PutObjectAsync(request);
-                    }
-                    //request.StreamTransferProgress -= RequestProgress;
-                }
-                return new UploadResult(true, Path: $"https://{Options.BucketName}.{Options.Endpoint}{rootPath}/{folderName}/{name + format}");
+                var response = await _client.PutObjectAsync(uploadRequest);
+                if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+                    return new UploadResult(true, Path: $"https://{_options.BucketName}.{_options.Region}.{(_options.UseCdn ? "cdn." : String.Empty)}{cleanedBody}/{filePath}/{key}");
+                else
+                    return new UploadResult(false, Error: $"An error ocurred during the upload process, HTTP CODE: {response.HttpStatusCode}");
             }
             catch (AmazonS3Exception e)
             {
@@ -110,67 +106,50 @@ namespace Tipi.Tools.Services
         /// Update an existing file
         /// </remarks>
         /// <param name="fileToUpdate">Base64 file</param>
-        /// <param name="folderName">Folder where the uploaded image is saved</param>
         /// <param name="fileUrl">Url of the image to update</param>
-        /// <returns>
-        /// Returns an <c>UploadResult</c> containing the operation result.
-        /// </returns>
-        public async Task<UploadResult> UpdateFileAsync(string fileToUpdate, string folderName, string fileUrl)
+        public async Task UpdateFileAsync(string fileToUpdate, string fileUrl)
         {
             fileToUpdate = ImageTools.CleanBase64Image(fileToUpdate.Split("|")[0]);
 
-            var s3ClientConfig = new AmazonS3Config
-            {
-                ServiceURL = Options.EndpointUrl,
-            };
-
-            // Split the Url to know the file name later on, file name is on the last index of the array.
-            var fileName = fileUrl.Split('/');
-
-            s3Client = new AmazonS3Client(Options.AccessKey, Options.SecretKey, s3ClientConfig);
-
             try
             {
-
                 // Converting the file to a byte array to save it with the memory stream
                 byte[] bytes = Convert.FromBase64String(fileToUpdate);
 
-                var rootPath = "";
-                if (!String.IsNullOrEmpty(Options.Root))
-                    rootPath = $"/{Options.Root}";
+                var key = fileUrl.Split("/").Last();
+                var filePath = fileUrl.Replace(_options.BucketName, "")
+                    .Replace(_options.Region, "")
+                    .Replace(key, "")
+                    .Replace("cdn", "")
+                    .Replace("https://", "")
+                    .Replace("digitaloceanspaces.com", "")
+                    .Replace(".", "")
+                    .Substring(1);
 
-                using (s3Client)
+                using var stream = new MemoryStream(bytes);
+
+                // Upload the stream
+                var uploadRequest = new PutObjectRequest
                 {
-                    var request = new PutObjectRequest
-                    {
-                        BucketName = Options.BucketName + rootPath + @"/" + folderName,
-                        CannedACL = S3CannedACL.PublicRead,
-                        Key = fileName[fileName.Length - 1]
-                    };
-                    //request.StreamTransferProgress += RequestProgress;
-                    using (var ms = new MemoryStream(bytes))
-                    {
-                        request.InputStream = ms;
-                        await s3Client.PutObjectAsync(request);
-                    }
-                    //request.StreamTransferProgress -= RequestProgress;
-                }
-                return new UploadResult(true);
+                    BucketName = _options.BucketName,
+                    Key = $"{filePath}{key}",
+                    InputStream = stream,
+                    CannedACL = S3CannedACL.PublicRead
+                };
+
+                await _client.PutObjectAsync(uploadRequest);
             }
             catch (AmazonS3Exception e)
             {
                 Console.WriteLine("Error encountered ***. Message:'{0}' when writing an object", e.Message);
-                return new UploadResult(false, Error: "S3 Error --- " + e);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
-                if (e.Message.Contains("disposed")) { };
-                return new UploadResult(false, Error: "Server Error --- " + e);
             }
         }
 
-        
+
 
         /// <summary>
         /// This method delete an existing file
@@ -179,47 +158,41 @@ namespace Tipi.Tools.Services
         /// <remarks>
         /// Delete an existing file
         /// </remarks>
-        /// <param name="url">Url of the file or file name</param>
-        /// <param name="folder">Folder where the uploaded image is saved</param>
+        /// <param name="fileUrl">Url of the file or file name</param>
         /// <returns>
         /// Returns an <c>UploadResult</c> containing the operation result.
         /// </returns>
-        public async Task<UploadResult> DeleteFileAsync(string url, string folder)
+        public async Task DeleteFileAsync(string fileUrl)
         {
-            var fileName = url.Split('/');
-            var s3ClientConfig = new AmazonS3Config
-            {
-                ServiceURL = Options.EndpointUrl,
-            };
-            s3Client = new AmazonS3Client(Options.AccessKey, Options.SecretKey, s3ClientConfig);
-
-            var rootPath = "";
-            if (!String.IsNullOrEmpty(Options.Root))
-                rootPath = $"/{Options.Root}";
 
             try
             {
-                using (s3Client)
+
+                var key = fileUrl.Split("/").Last();
+                var filePath = fileUrl.Replace(_options.BucketName, "")
+                    .Replace(_options.Region, "")
+                    .Replace(key, "")
+                    .Replace("cdn", "")
+                    .Replace("https://", "")
+                    .Replace("digitaloceanspaces.com", "")
+                    .Replace(".", "")
+                    .Substring(1);
+
+                var deleteRequest = new DeleteObjectRequest
                 {
-                    var request = new DeleteObjectRequest
-                    {
-                        BucketName = Options.BucketName + rootPath + @"/" + folder,
-                        Key = fileName[fileName.Length - 1]
-                    };
-                    await s3Client.DeleteObjectAsync(request);
-                }
-                return new UploadResult(true);
+                    BucketName = _options.BucketName,
+                    Key = $"{filePath}{key}"
+                };
+
+                await _client.DeleteObjectAsync(deleteRequest);
             }
             catch (AmazonS3Exception e)
             {
                 Console.WriteLine("Error encountered ***. Message:'{0}' when writing an object", e.Message);
-                return new UploadResult(false, Error: "S3 Error --- " + e);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
-                if (e.Message.Contains("disposed")) { };
-                return new UploadResult(false, Error: "Server Error --- " + e);
             }
         }
         #endregion

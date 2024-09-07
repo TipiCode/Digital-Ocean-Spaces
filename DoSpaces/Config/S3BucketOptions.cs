@@ -33,9 +33,13 @@ namespace Tipi.Tools.Services.Config
         /// </summary>
         public string EndpointUrl { get; }
         /// <summary>
-        /// Spaces url
+        /// Region
         /// </summary>
-        public string Endpoint { get; }
+        public string Region { get; }
+        /// <summary>
+        /// Region
+        /// </summary>
+        public bool UseCdn { get; } = default!;
 
         /// <summary>
         /// Constructor to initialize the <c>S3BucketOptions</c> object.
@@ -51,7 +55,8 @@ namespace Tipi.Tools.Services.Config
             BucketName = values["BucketName"];
             Root = values["Root"];
             EndpointUrl = values["EndpointUrl"];
-            Endpoint = values["Endpoint"];
+            Region = values["Region"];
+            UseCdn = bool.Parse(values["UseCdn"]);
         }
     }
 }
